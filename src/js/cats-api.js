@@ -1,5 +1,5 @@
 import { BASE_URL, API_KEY } from './config.js';
-import { showErrorMsg, errorNotificationOptions } from './error-handler.js';
+import { errorNotificationOptions } from './error-handler.js';
 
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
@@ -21,7 +21,6 @@ export const fetchBreeds = async () => {
     return response.json();
   } catch (error) {
     iziToast.error(errorNotificationOptions);
-    setTimeout(showErrorMsg, 1000);
     console.log(error);
   }
 };
@@ -41,7 +40,6 @@ export const fetchCatByBreed = async breedId => {
     return result;
   } catch (error) {
     iziToast.error(errorNotificationOptions);
-    setTimeout(showErrorMsg, 1000);
     console.log(error);
   }
 };

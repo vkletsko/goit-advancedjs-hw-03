@@ -23,3 +23,60 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
+
+.visually-hidden {
+  display: none;
+}
+
+.preloader {
+  color: black;
+}
+
+.error-msg {
+  color: red;
+}
+
+.cat-card {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.cat-card-content {
+  display: flex;
+  align-items: center;
+}
+
+.cat-card-left {
+  flex: 1;
+  max-width: 40%;
+  margin-right: 20px;
+}
+
+.cat-card-img {
+  width: 100%;
+  height: auto;
+}
+
+.cat-card-img-container {
+  width: 400px; /* Fixed width */
+  height: 400px; /* Fixed height */
+  overflow: hidden; /* Hide overflow to keep the aspect ratio */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cat-card-right {
+  flex: 2;
+}
+
+.cat-card-title {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.cat-card-desc,
+.cat-card-temp {
+  margin-bottom: 10px;
+}

@@ -1,5 +1,5 @@
 import { fetchBreeds, fetchCatByBreed } from './cats-api.js';
-import { showErrorMsg, errorNotificationOptions } from './error-handler.js';
+import { errorNotificationOptions } from './error-handler.js';
 import SlimSelect from 'slim-select';
 import iziToast from 'izitoast';
 
@@ -9,7 +9,7 @@ import 'slim-select/styles';
 export const refs = {
   select: document.querySelector('select.breed-select'),
   cardWrapper: document.querySelector('.cat-info'),
-  errorMsg: document.querySelector('.error-msg'),
+  preloader: document.querySelector('.preloader'),
 };
 
 const createOptionsMarkup = data => {
@@ -19,58 +19,74 @@ const createOptionsMarkup = data => {
 };
 const createCatMarkup = ({ breeds, url }) => {
   const [params] = breeds;
-  return `<article class="cat-card">
-    <div class="cat-card-left">
-      <img
-        class="cat-card-img"
-        src="${url}"
-        alt="${params.name}"
-      />
-    </div>
-    <div class="cat-card-right">
-      <h2 class="cat-card-title">${params.name}</h2>
-      <p class="cat-card-desc">${params.description}</p>
-      <p class="cat-card-tepm">
-        <strong>Temperament:</strong>
-        ${params.temperament}
-      </p>
-    </div>
-  </article>`;
+  return `
+    <article class="cat-card">
+      <div class="cat-card-content">
+        <div class="cat-card-left">
+          <div class="cat-card-img-container">
+            <img
+              class="cat-card-img"
+              src="${url}"
+              alt="${params.name}"
+            />
+          </div>
+        </div>
+        <div class="cat-card-right">
+          <h2 class="cat-card-title">${params.name}</h2>
+          <p class="cat-card-desc">${params.description}</p>
+          <p class="cat-card-temp">
+            <strong>Temperament:</strong>
+            ${params.temperament}
+          </p>
+        </div>
+      </div>
+    </article>`;
 };
 const onSelectChange = async selectData => {
   try {
     refs.cardWrapper.innerHTML = '';
-    refs.errorMsg.innerHTML = '';
     const { value } = selectData[0];
+    refs.preloader.style.display = 'block'; // Show preloader
     const response = await fetchCatByBreed(value);
+    refs.preloader.style.display = 'none'; // Hide preloader
     if (!response) return;
+
     const catInfo = response[0];
     refs.cardWrapper.innerHTML = createCatMarkup(catInfo);
   } catch (error) {
     iziToast.error(errorNotificationOptions);
-    setTimeout(showErrorMsg, 1000);
     console.log(error);
   }
 };
 const initBreeds = async () => {
-  const breeds = await fetchBreeds();
-  if (!breeds) {
-    refs.select.style.display = 'none';
-    return;
-  }
+  try {
+    refs.preloader.style.display = 'block'; // Show preloader
+    const breeds = await fetchBreeds();
+    if (!breeds) {
+      return;
+    }
 
-  refs.select.innerHTML = await createOptionsMarkup(breeds);
-  new SlimSelect({
-    select: 'select.breed-select',
-    settings: {
-      placeholderText: 'Select the cat breed',
-    },
-    events: {
-      afterChange: info => {
-        onSelectChange(info);
+    refs.select.innerHTML = await createOptionsMarkup(breeds);
+    new SlimSelect({
+      select: 'select.breed-select',
+      settings: {
+        placeholderText: 'Select the cat breed',
+        showSearch: false,
+        maxValuesShown: 10, // Default 20
       },
-    },
-  });
+      events: {
+        afterChange: info => {
+          onSelectChange(info);
+        },
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  } finally {
+    refs.preloader.style.display = 'none'; // Hide preloader
+  }
 };
 
-document.addEventListener('DOMContentLoaded', initBreeds);
+document.addEventListener('DOMContentLoaded', () => {
+  initBreeds();
+}, {"once":true});
